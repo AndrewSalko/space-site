@@ -9,7 +9,7 @@ displayInList: true
 draft: false
 resources:
 - name: featuredImage
-  src: "mdd-iphone.jpg"
+  src: "netcore-twitter-rena.png"
 ---
 
 To tweet programmatically, you need one of the libraries. In this example, I will consider [Tweetinvi](https://github.com/linvi/tweetinvi). You need just add nuget package to your project.
