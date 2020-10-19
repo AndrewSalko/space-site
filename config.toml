@@ -1,0 +1,19 @@
+baseurl = "https://www.andrewsalko.space"
+title = "Developer's blog"
+author = "Andrew Salko"
+canonifyurls = true
+paginate = 3
+theme = "aether"
+
+enableRobotsTXT= true
+
+languageCode = "en-US"
+
+[params]
+    brand = "Developer's blog"
+    description = ".NET developer blog"
+    bgimg = "img/natural_paper.png"
+
+[markup]
+  [markup.highlight]
+    style = "igor"
