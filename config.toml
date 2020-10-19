@@ -9,6 +9,8 @@ enableRobotsTXT= true
 
 languageCode = "en-US"
 
+googleAnalytics="UA-93731751-2"
+
 [params]
     brand = "Developer's blog"
     description = ".NET developer blog"
