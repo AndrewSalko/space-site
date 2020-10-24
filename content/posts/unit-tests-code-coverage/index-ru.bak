@@ -1,0 +1,150 @@
+---
+title: "Unit testing and code coverage .NET Core"
+date: 2020-10-22T10:00:35-05:00
+description: "Creating C# unit test project example and code coverage analysis"
+categories: [".NET Core"]
+dropCap: true
+displayInMenu: false
+displayInList: true
+draft: false
+resources:
+- name: featuredImage
+  src: "unit-tests-and-coverage.png"
+---
+
+Юнит-тестирование и покрытие кода в .NET Core
+
+Надежные приложения обычно включают автоматизированное тестирование (юнит-тесты, интеграционные тесты).
+Ниже мы рассмотрим пример простого приложения и юнит-тестов для него, а также разберемся как проверить покрытие кода в случае
+применения разных редакций Visual Studio.
+
+Приложение содержит класс PrimeNumber.cs, который позволяет определить, является ли целое число "простым".
+
+Сам проект prime-numbers-app выполнен в виде консольного приложения. Юнит-тесты рекомендуется размещать в отдельном проекте.
+Для этого создайте его через консольный вызов:
+
+```bat
+dotnet new mstest -n prime-numbers-tests
+```
+
+![dotnet new mstest -n prime-numbers-tests](create-unit-test-project.png "Create MSTest project")
+
+Файл проекта юнит-тестов имеет такие подключенные пакеты:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>prime_numbers_tests</RootNamespace>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.0" />
+    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+  </ItemGroup>
+</Project>
+```
+Если вы хотите писать пригодные для юнит-тестов программы, следуйте простым правилам:
+
+1) Каждый класс должен выполнять лишь одно действие
+2) Избегайте передачи в конструктор других своих классов, а передавайте интерфейсы
+Таким образом у вас часто будет ситуация, когда вместе с классом вы сразу объявляете его интерфейс.
+
+3) Если вам нужно в одном классе создать экземпляр другого класса, уже не стоит просто писать MyClass x=new MyClass().
+В таком случае вы не сможете заменить его реализацию заглушкой (стабом). Вместо этого вам стоит создать 
+фабрику класса, и она должна "порождать" вам то, что нужно.
+
+
+В проекте-примере мы будем тестировать один класс - **PrimeNumber**. Для этого создан тест-класс **PrimeNumberTests**.
+
+Каждый тест-класс должен быть отмечен атрибутом **[TestClass]**, а тест-методы - **[TestMethod]**.
+Но для еще большей наглядности я рекомендую использовать также атрибуты **[Description]** для описания теста,
+и **[TestCategory]**, в категории будем передавать имя класса, который тестируется. Таким образом вы сможете группировать
+тесты и видеть их в удобном виде в Visual Studio.
+
+```csharp
+[TestClass]
+public class PrimeNumberTests
+{
+	/// <summary>
+	/// For 0-argument throws ArgumentException
+	/// </summary>
+	[TestMethod]
+	[Description("Unit test for zero argument")]
+	[TestCategory("IsPrimeNumber")]
+	public void IsPrimeNumber_ZeroArg_Exception()
+	{
+		try
+		{
+			var prime = new PrimeNumber();
+
+            //Zero is forbidden argument, so Exception must be thrown
+            prime.IsPrimeNumber(0);
+
+            Assert.Fail("ArgumentException expected");
+		}
+		catch (ArgumentException ex)
+		{
+			//Caller must know argument's name - so validate it here
+			Assert.IsTrue(ex.ParamName == "number");
+		}
+	}
+
+}
+```
+
+## Покрытие кода
+
+Юнит-тесты дают уверенность что вносимые изменения не нарушают то, что раньше работало. Разумеется, следует
+проверять самые разные варианты работы ваших классов (и программы в целом), но вручную отследить все невозможно.
+Механизм "покрытие кода" позволяет точно увидеть, какие части классов проверялись в ходе прогона тестов, а какие
+остались непроверенными.
+
+Если вы используете Visual Studio Community, в вашем распоряжении есть базовые возможности тестирования, без 
+анализа покрытия кода. 
+
+С помощью Test Explorer можно запустить тесты и увидеть результаты:
+
+![Test Explorer with test results](test-results.png "Test Explorer in Visual Studio")
+
+**Visual Studio Enterprise** содержит встроенный инструмент для анализа покрытия кода:
+
+![Code coverage in Visual Studio](code-coverage-100percents.png "Code Coverage in Visual Studio Enterprise")
+
+## Бесплатный инструмент для анализа покрытия кода
+
+Юнит-тесты можно выполнить через консольный вызов. Вы можете создать bat-файл, такого содержания:
+
+```bat
+cd kawaii.twitter.core.tests 
+dotnet test --collect:"XPlat Code Coverage" -r "..\TestResults"
+```
+
+В консоли вы увидите результат выполнения тестов:
+
+![dotnet test --collect:"XPlat Code Coverage" -r "..\TestResults"](console-unit-test-run.png "dotnet test results output")
+
+Аргумент **collect:"XPlat Code Coverage"** важен для того, чтобы применить инструмент визуализации результатов.
+Загрузите с GitHub утилиту [ReportGenerator](https://github.com/danielpalme/ReportGenerator), с ее помощью можно получить html-страницы отчета покрытия кода.
+
+Пример команды построения отчета:
+
+```bat
+reportgenerator  "-reports:TestResults\17d7824a-3a89-4a90-af48-da769b1d416e\coverage.cobertura.xml" "-targetdir:TestsCoverageReport" -reporttypes:Html
+```
+
+Стоит отметить, что генерация файла coverage.cobertura.xml идет всегда в папку с guid-именем, поэтому скорректируйте
+пример под свой случай.
+
+В папке **TestsCoverageReport** вы увидите index.html, откройте его браузером - это интерактивный отчет:
+
+![Code Coverage ReportGenerator](coverage-report-html.png "Code Coverage ReportGenerator result")
+
+Как видим, наш класс PrimeNumber имеет 100% покрытие кода тестами. Вы можете кликнуть по нему в отчете, чтобы просмотреть каждую протестированную строку.
+
+В моем репозитории [https://github.com/AndrewSalko/prime-numbers-unittest-example](https://github.com/AndrewSalko/prime-numbers-unittest-example) вы найдете пример проекта, bat-файлы для консольного запуска тестов и построения отчета.
+

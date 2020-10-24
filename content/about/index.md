@@ -1,6 +1,6 @@
 +++
 title = "About me"
-date = "2020-10-18"
+date = "2020-10-24T08:55:00Z"
 displayInMenu = true
 displayInList = false
 dropCap = false
