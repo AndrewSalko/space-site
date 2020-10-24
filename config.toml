@@ -15,6 +15,7 @@ googleAnalytics="UA-93731751-2"
     brand = "Developer's blog"
     description = ".NET developer blog"
     bgimg = "img/natural_paper.png"
+	metaCreator = "@LelouchUkraine"
 
 [markup]
   [markup.highlight]

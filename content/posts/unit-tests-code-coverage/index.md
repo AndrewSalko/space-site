@@ -2,7 +2,7 @@
 title: "Unit testing and code coverage .NET Core"
 date: 2020-10-24T08:53:08Z
 description: "Creating C# unit test project example and code coverage analysis"
-categories: [".NET Core"]
+categories: [".NET Core", "Unit testing"]
 dropCap: true
 displayInMenu: false
 displayInList: true
