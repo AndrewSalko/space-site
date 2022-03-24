@@ -17,6 +17,8 @@ googleAnalytics="UA-93731751-2"
     bgimg = "img/natural_paper.png"
 	metaCreator = "@LelouchUkraine"
 
+	googleAnalyticsID="G-RLJN3EZ5XX"
+
 [markup]
   [markup.highlight]
     style = "igor"
